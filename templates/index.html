@@ -1,0 +1,422 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice-Enabled Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src='https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.css' rel='stylesheet' />
+    <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-directions/v4.1.0/mapbox-gl-directions.js"></script>
+    <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-directions/v4.1.0/mapbox-gl-directions.css" type="text/css" />
+    <style>
+        #map {
+            height: 600px;
+            width: 100%;
+        }
+
+        #controls {
+            margin: 10px;
+        }
+
+        #transcript {
+            margin: 10px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map"></div>
+    <div id="controls">
+        <button id="start-recognition">Start Voice Recognition</button>
+        <button id="stop-recognition">Stop Voice Recognition</button>
+        <div id="transcript">Transcript: </div>
+    </div>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+
+        
+        const map = L.map('map').setView([51.505, -0.09], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        let recognition;
+        const transcriptElement = document.getElementById('transcript');
+
+        if ('webkitSpeechRecognition' in window) {
+            recognition = new webkitSpeechRecognition();
+            recognition.continuous = true;
+            recognition.interimResults = false;
+            recognition.lang = 'en-US';
+
+            recognition.onstart = function () {
+                console.log('Voice recognition started.');
+            };
+
+            recognition.onresult = function (event) {
+                const transcript = event.results[event.results.length - 1][0].transcript.trim();
+                console.log('You said: ', transcript);
+                transcriptElement.textContent = `Transcript: ${transcript}`;
+                handleVoiceCommand(transcript.toLowerCase());
+            };
+
+            recognition.onerror = function (event) {
+                console.error('Error occurred in recognition: ', event.error);
+            };
+
+            document.getElementById('start-recognition').onclick = () => recognition.start();
+            document.getElementById('stop-recognition').onclick = () => recognition.stop();
+        } else {
+            console.log('Web Speech API is not supported by this browser.');
+        }
+
+        function handleVoiceCommand(command) {
+            if (command.includes('zoom in')) {
+                map.zoomIn();
+                speak('Zooming in.');
+            } else if (command.includes('zoom out')) {
+                map.zoomOut();
+                speak('Zooming out.');
+            } else if (command.includes('go to')) {
+                const location = command.replace('go to ', '');
+                geocodeAndPanTo(location);
+                speak(`Navigating to ${location}.`);
+            } else if (command.includes('add marker at')) {
+                const location = command.replace('add marker at ', '');
+                geocodeAndAddMarker(location);
+                speak(`Adding marker at ${location}.`);
+            } else {
+                speak('Command not recognized. Please try again.');
+            }
+        }
+
+        function geocodeAndPanTo(location) {
+            fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${location}.json?access_token=pk.eyJ1Ijoic3ViaGFtcHJlZXQiLCJhIjoiY2toY2IwejF1MDdodzJxbWRuZHAweDV6aiJ9.Ys8MP5kVTk5P9V2TDvnuDg`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.features && data.features.length > 0) {
+                        const [lng, lat] = data.features[0].center;
+                        map.setView([lat, lng], 13);
+                        L.marker([lat, lng]).addTo(map).bindPopup(location).openPopup();
+                    } else {
+                        speak('Location not found.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    speak('An error occurred while finding the location.');
+                });
+        }
+
+        function geocodeAndAddMarker(location) {
+            fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${location}.json?access_token=YOUR_MAPBOX_ACCESS_TOKEN`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.features && data.features.length > 0) {
+                        const [lng, lat] = data.features[0].center;
+                        const marker = L.marker([lat, lng]).addTo(map);
+                        map.setView([lat, lng], 13);
+                        marker.bindPopup(location).openPopup();
+                    } else {
+                        speak('Location not found.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    speak('An error occurred while finding the location.');
+                });
+        }
+
+        function speak(text) {
+            if ('speechSynthesis' in window) {
+                recognition.stop();  // Stop recognition while speaking
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.onend = function () {
+                    recognition.start();  // Restart recognition after speaking
+                };
+                speechSynthesis.speak(utterance);
+            } else {
+                console.log('Speech Synthesis API is not supported by this browser.');
+            }
+        }
+
+        // Speak a welcome message once the page is loaded
+        window.onload = function () {
+            speak('Welcome to the voice-enabled map application.');
+        }
+    </script>
+</body>
+
+</html> -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice-Enabled Map</title>
+    <script src='https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.css' rel='stylesheet' />
+    <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-directions/v4.1.0/mapbox-gl-directions.js"></script>
+    <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-directions/v4.1.0/mapbox-gl-directions.css" type="text/css" />
+
+    <style>
+        #map {
+            height: 600px;
+            width: 100%;
+        }
+
+        #controls {
+            margin: 10px;
+        }
+
+        #transcript {
+            margin: 10px;
+            font-size: 16px;
+        }
+
+        #popup {
+            display: none;
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            padding: 20px;
+            border: 1px solid #ccc;
+            z-index: 1000;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+        }
+
+        #close-popup {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+        }
+
+        #mic-button {
+            font-size: 16px;
+            padding: 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map"></div>
+    <div id="controls">
+        <button id="mic-button">🎤 Start Voice Recognition</button>
+        <div id="popup">
+            <div id="close-popup">Close</div>
+            <div id="transcript">Transcript: </div>
+        </div>
+    </div>
+    <script src="./js/script.js" defer></script>
+    <script>
+        mapboxgl.accessToken = 'pk.eyJ1Ijoic3ViaGFtcHJlZXQiLCJhIjoiY2toY2IwejF1MDdodzJxbWRuZHAweDV6aiJ9.Ys8MP5kVTk5P9V2TDvnuDg';
+
+        navigator.geolocation.getCurrentPosition(successLocation, errorLocation, {
+            enableHighAccuracy: true
+        });
+
+        function successLocation(position) {
+            setupMap([position.coords.longitude, position.coords.latitude]);
+        }
+
+        function errorLocation() {
+            setupMap([-2.24, 53.48]);
+        }
+
+        function setupMap(center) {
+            const map = new mapboxgl.Map({
+                container: "map",
+                style: "mapbox://styles/mapbox/streets-v11",
+                center: center,
+                zoom: 15
+            });
+
+            const nav = new mapboxgl.NavigationControl();
+            map.addControl(nav);
+
+            var directions = new MapboxDirections({
+                accessToken: mapboxgl.accessToken
+            });
+
+            map.addControl(directions, "top-left");
+
+            // Add voice recognition and commands
+            let recognition;
+            const transcriptElement = document.getElementById('transcript');
+            const popup = document.getElementById('popup');
+            const micButton = document.getElementById('mic-button');
+            const closePopup = document.getElementById('close-popup');
+            let currentMarker;
+
+            micButton.onclick = function () {
+                if (!recognition) {
+                    initializeRecognition();
+                } else if (recognition && recognition.running) {
+                    recognition.stop();
+                } else {
+                    recognition.start();
+                }
+            };
+
+            closePopup.onclick = function () {
+                recognition.stop();
+                popup.style.display = 'none';
+            };
+
+            function initializeRecognition() {
+                if ('webkitSpeechRecognition' in window) {
+                    recognition = new webkitSpeechRecognition();
+                    recognition.continuous = true;
+                    recognition.interimResults = false;
+                    recognition.lang = 'en-US';
+
+                    recognition.onstart = function () {
+                        console.log('Voice recognition started.');
+                        micButton.textContent = '🎤 Listening...';
+                        popup.style.display = 'block';
+                    };
+
+                    recognition.onresult = function (event) {
+                        const transcript = event.results[event.results.length - 1][0].transcript.trim();
+                        console.log('You said: ', transcript);
+                        transcriptElement.textContent = `Transcript: ${transcript}`;
+                        setTimeout(() => handleVoiceCommand(transcript.toLowerCase()), 500);
+                    };
+
+                    recognition.onerror = function (event) {
+                        console.error('Error occurred in recognition: ', event.error);
+                    };
+
+                    recognition.onend = function () {
+                        micButton.textContent = '🎤 Start Voice Recognition';
+                        popup.style.display = 'none';
+                    };
+                } else {
+                    console.log('Web Speech API is not supported by this browser.');
+                    micButton.disabled = true;
+                }
+            }
+
+            function handleVoiceCommand(command) {
+                if (command.includes('zoom in')) {
+                    map.zoomIn();
+                    speakAndClosePopup('Zooming in.');
+                } else if (command.includes('zoom out')) {
+                    map.zoomOut();
+                    speakAndClosePopup('Zooming out.');
+                } else if (command.includes('go to')) {
+                    const location = command.replace('go to ', '');
+                    geocodeAndPanTo(location);
+                    speakAndClosePopup(`Navigating to ${location}.`);
+                } else if (command.includes('add marker at')) {
+                    const location = command.replace('add marker at ', '');
+                    geocodeAndAddMarker(location);
+                    speakAndClosePopup(`Adding marker at ${location}.`);
+                } else if (command.includes('show streets view')) {
+                    map.setStyle('mapbox://styles/mapbox/streets-v11');
+                    speakAndClosePopup('Showing streets view.');
+                } else if (command.includes('show satellite view')) {
+                    map.setStyle('mapbox://styles/mapbox/satellite-v9');
+                    speakAndClosePopup('Showing satellite view.');
+                } else if (command.includes('show dark view')) {
+                    map.setStyle('mapbox://styles/mapbox/dark-v10');
+                    speakAndClosePopup('Showing dark view.');
+                } else if (command.includes('show light view')) {
+                    map.setStyle('mapbox://styles/mapbox/light-v10');
+                    speakAndClosePopup('Showing light view.');
+                } else {
+                    speakAndClosePopup('Command not recognized. Please try again.');
+                }
+            }
+
+            function geocodeAndPanTo(location) {
+                fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${location}.json?access_token=${mapboxgl.accessToken}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.features && data.features.length > 0) {
+                            const [lng, lat] = data.features[0].center;
+                            map.flyTo({
+                                center: [lng, lat],
+                                essential: true
+                            });
+                            if (currentMarker) {
+                                currentMarker.remove();
+                            }
+                            currentMarker = new mapboxgl.Marker()
+                                .setLngLat([lng, lat])
+                                .setPopup(new mapboxgl.Popup().setText(location))
+                                .addTo(map)
+                                .togglePopup();
+                            speakAndClosePopup(`Navigated to ${location}.`);
+                        } else {
+                            speakAndClosePopup('Location not found.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        speakAndClosePopup('An error occurred while processing the location.');
+                    });
+            }
+
+            function geocodeAndAddMarker(location) {
+                fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${location}.json?access_token=${mapboxgl.accessToken}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.features && data.features.length > 0) {
+                            const [lng, lat] = data.features[0].center;
+                            if (currentMarker) {
+                                currentMarker.remove();
+                            }
+                            currentMarker = new mapboxgl.Marker()
+                                .setLngLat([lng, lat])
+                                .setPopup(new mapboxgl.Popup().setText(location))
+                                .addTo(map)
+                                .togglePopup();
+                            map.flyTo({
+                                center: [lng, lat],
+                                essential: true
+                            });
+                        } else {
+                            speakAndClosePopup('Location not found.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        speakAndClosePopup('An error occurred while adding the marker.');
+                    });
+            }
+
+            function speakAndClosePopup(message) {
+                const speech = new SpeechSynthesisUtterance(message);
+                speechSynthesis.speak(speech);
+                speech.onend = () => {
+                    popup.style.display = 'none';
+                };
+            }
+            function speak(message) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(message);
+                speechSynthesis.speak(utterance);
+            } else {
+                console.log('Speech Synthesis API is not supported by this browser.');
+            }
+        }
+
+        // Speak a welcome message once the page is loaded
+        window.onload = function () {
+            speak('Welcome to the voice-enabled map application.');
+        }
+    }
+    </script>
+</body>
+
+</html>
